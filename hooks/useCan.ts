@@ -1,38 +1,25 @@
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
+import { validateUserPermissions } from "../utils/validateUserPermissions";
 
 type UseCanPrams = {
   permissions?: string[],
   roles?: string[],
 }
 
-export function useCan({permissions, roles}: UseCanPrams) {
-  const {user, isAuthenticated} = useContext(AuthContext);
+export function useCan({ permissions, roles }: UseCanPrams) {
+  const { user, isAuthenticated } = useContext(AuthContext);
 
-  if(!isAuthenticated) {
+  if (!isAuthenticated) {
     return false;
   }
 
-  if(permissions?.length > 0) {
-    const hasAllPermissions = permissions.every(permissions => {
-      return user.permissions.includes(permissions);
-    })
+  const userHasValidPermissions = validateUserPermissions({
+    user,
+    permissions,
+    roles
+  })
 
-    if(!hasAllPermissions) {
-      return false;
-    }
-  }
+  return userHasValidPermissions;
 
-  if(roles?.length > 0) {
-    const hasAllRoles = roles.some(role => {
-      return user.permissions.includes(role);
-    })
-
-    if(!hasAllRoles) {
-      return false;
-    }
-  }
-
-  return true;
-  
 }
